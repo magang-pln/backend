@@ -30,10 +30,10 @@ const register = async (req, res, next) => {
     res.status(201).json({
       status: "Success",
       message: "User registered successfully",
-      data: { id: newUser.id, email: newUser.email, password: hashedPassword },
+      data: { id: newUser.id, email: newUser.email },
     });
   } catch (err) {
-    return next(new ApiError("Failed to register user", 500));
+    return next(new ApiError(err, 500));
   }
 };
 
@@ -65,7 +65,7 @@ const login = async (req, res, next) => {
       data: { token },
     });
   } catch (err) {
-    return next(new ApiError("Failed to log in", 500));
+    return next(new ApiError(err, 500));
   }
 };
 
