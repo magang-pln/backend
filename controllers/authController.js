@@ -4,7 +4,7 @@ const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const { Users } = require("../models");
 const ApiError = require("../utils/apiError");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 const register = async (req, res, next) => {
   try {
