@@ -2,7 +2,7 @@ const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
-const { User } = require("../models");
+const { Users } = require("../models");
 const ApiError = require("../utils/apiError");
 const { Op } = require("sequelize");
 
@@ -10,7 +10,7 @@ const register = async (req, res, next) => {
   try {
     const { email, password, confirmPassword } = req.body;
 
-    const isUserExist = await User.findOne({ where: { email } });
+    const isUserExist = await Users.findOne({ where: { email } });
     if (isUserExist) {
       return next(new ApiError("Email already registered", 400));
     }
@@ -25,12 +25,12 @@ const register = async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({ email, password: hashedPassword });
+    const newUser = await Users.create({ email, password: hashedPassword });
 
     res.status(201).json({
       status: "Success",
       message: "User registered successfully",
-      data: { id: newUser.id, email: newUser.email },
+      data: { id: newUser.id, email: newUser.email, password: hashedPassword },
     });
   } catch (err) {
     return next(new ApiError("Failed to register user", 500));
@@ -45,7 +45,7 @@ const login = async (req, res, next) => {
       return next(new ApiError("Email and password are required", 400));
     }
 
-    const user = await User.findOne({ where: { email } });
+    const user = await Users.findOne({ where: { email } });
     if (!user) {
       return next(new ApiError("Invalid email or password", 400));
     }
