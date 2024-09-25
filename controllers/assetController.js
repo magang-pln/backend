@@ -235,27 +235,21 @@ const deleteAsset = async (req, res, next) => {
   try {
     const id = req.params.id;
     const asset = await Asset.findOne({
-      where: {
-        id,
-      },
+      where: { id },
     });
 
     if (!asset) {
-      next(new apiError(`Asset with id '${id}' is not found`, 404));
+      return next(new ApiError(`Asset with id '${id}' is not found`, 404));
     }
-    await asset.destroy({
-      where: {
-        id,
-      },
-    });
+
+    await asset.destroy();
 
     res.status(200).json({
       status: "Success",
-      message: `Asset with id '${asset.id}' is deleted successfully`,
-      requestAt: req.requestTime,
+      message: `Asset with id '${id}' has been deleted successfully`,
     });
   } catch (err) {
-    return next(new apiError(err.message, 400));
+    return next(new ApiError(err.message, 400));
   }
 };
 
