@@ -35,5 +35,6 @@
   },
   "engines": {
     "node": ">=14.0.0"
-  }
+  },
+  "proxy": "https://backend-production-a671.up.railway.app"
 }
