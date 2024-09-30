@@ -13,13 +13,7 @@ const app = express();
 
 app.set("trust proxy", true);
 
-const corsOptions = {
-  origin: ["http://localhost:3000"],
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(morgan("dev"));
 
