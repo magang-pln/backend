@@ -3,7 +3,6 @@ const path = require("path");
 const fs = require("fs");
 const ApiError = require("../utils/apiError");
 const apiError = require("../utils/apiError");
-const { where } = require("sequelize");
 
 const findAssets = async (req, res, next) => {
   try {
@@ -68,7 +67,9 @@ const createAsset = async (req, res, next) => {
       tanggal_berakhir_sertipikat,
       penguasaan_tanah,
       permasalahan_aset,
-      kantah_BPN_sertifiksai,
+      kantah_BPN_sertifikasi,
+      kordinat_x,
+      kordinat_y,
     } = req.body;
 
     let formattedTanggalBerlaku = null;
@@ -104,7 +105,9 @@ const createAsset = async (req, res, next) => {
       tanggal_berakhir_sertipikat: formattedTanggalBerakhir,
       penguasaan_tanah,
       permasalahan_aset,
-      kantah_BPN_sertifiksai,
+      kantah_BPN_sertifikasi,
+      kordinat_x,
+      kordinat_y,
       kronologis: files.kronologis ? files.kronologis[0].filename : null,
       sertipikat: files.sertipikat ? files.sertipikat[0].filename : null,
     });
@@ -167,7 +170,9 @@ const updateAsset = async (req, res, next) => {
       tanggal_berakhir_sertipikat,
       penguasaan_tanah,
       permasalahan_aset,
-      kantah_BPN_sertifiksai,
+      kantah_BPN_sertifikasi,
+      kordinat_x,
+      kordinat_y,
     } = req.body;
 
     let formattedTanggalBerlaku = null;
@@ -214,7 +219,9 @@ const updateAsset = async (req, res, next) => {
         tanggal_berakhir_sertipikat: formattedTanggalBerakhir,
         penguasaan_tanah,
         permasalahan_aset,
-        kantah_BPN_sertifiksai,
+        kantah_BPN_sertifikasi,
+        kordinat_x,
+        kordinat_y,
         kronologis: files.kronologis
           ? files.kronologis[0].filename
           : asset.kronologis,
