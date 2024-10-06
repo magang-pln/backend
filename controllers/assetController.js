@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const ApiError = require("../utils/apiError");
 const apiError = require("../utils/apiError");
+const { uploadFile } = require("../utils/googleDrive");
 
 const findAssets = async (req, res, next) => {
   try {
@@ -85,6 +86,21 @@ const createAsset = async (req, res, next) => {
       formattedTanggalBerakhir = `${endYear}-${endMonth}-${endDay}`;
     }
 
+    let kronologisFileId = null;
+    let sertipikatFileId = null;
+
+    if (files.kronologis) {
+      const kronologisPath = files.kronologis[0].path;
+      const mimeType = files.kronologis[0].mimeType;
+      kronologisFileId = await uploadFile(kronologisPath, mimeType);
+    }
+
+    if (files.sertipikat) {
+      const sertipikatPath = files.sertipikat[0].path;
+      const mimeType = files.sertipikat[0].mimeType;
+      sertipikatFileId = await uploadFile(sertipikatPath, mimeType);
+    }
+
     const newAsset = await Asset.create({
       unit_induk,
       nama_aset,
@@ -108,8 +124,8 @@ const createAsset = async (req, res, next) => {
       kantah_BPN_sertifikasi,
       kordinat_x,
       kordinat_y,
-      kronologis: files.kronologis ? files.kronologis[0].filename : null,
-      sertipikat: files.sertipikat ? files.sertipikat[0].filename : null,
+      kronologis: kronologisFileId,
+      sertipikat: sertipikatFileId,
     });
 
     if (!newAsset) {
@@ -133,16 +149,48 @@ const createAsset = async (req, res, next) => {
   }
 };
 
-const downloadFile = (req, res) => {
+const downloadFile = (req, res, next) => {
   const filename = req.params.filename;
   const filePath = path.join(__dirname, "../uploads", filename);
 
-  res.download(filePath, (err) => {
+  fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) {
-      console.error("Error downloading the file:", err);
-      res.status(404).send("File not found");
+      console.error("File does not exist:", err);
+      return next(new apiError(err.message, 404));
     }
+
+    res.download(filePath, (err) => {
+      if (err) {
+        console.error("Error downloading the file:", err);
+        return next(new apiError(err.message, 500));
+      }
+    });
   });
+};
+
+const findAssetFilesById = async (req, res, next) => {
+  try {
+    const findAsset = await Asset.findByPk(req.params.id);
+
+    if (!findAsset) {
+      return next(
+        new ApiError(`Cannot find asset with id: ${req.params.id}`, 400)
+      );
+    }
+
+    // Mengambil ID file kronologis dan sertipikat dari asset
+    const { kronologis, sertipikat } = findAsset;
+
+    res.status(200).json({
+      status: "Success",
+      data: {
+        kronologis,
+        sertipikat,
+      },
+    });
+  } catch (err) {
+    next(new ApiError(err.message, 400));
+  }
 };
 
 const updateAsset = async (req, res, next) => {
@@ -198,6 +246,21 @@ const updateAsset = async (req, res, next) => {
       return next(new apiError(`Asset with id '${id}' is not found`, 404));
     }
 
+    let kronologisFileId = asset.kronologis;
+    let sertipikatFileId = asset.sertipikat;
+
+    if (files.kronologis) {
+      const kronologisPath = files.kronologis[0].path;
+      const mimeType = files.kronologis[0].mimeType;
+      kronologisFileId = await uploadFile(kronologisPath, mimeType);
+    }
+
+    if (files.sertipikat) {
+      const sertipikatPath = files.sertipikat[0].path;
+      const mimeType = files.sertipikat[0].mimeType;
+      sertipikatFileId = await uploadFile(sertipikatPath, mimeType);
+    }
+
     await Asset.update(
       {
         unit_induk,
@@ -222,12 +285,8 @@ const updateAsset = async (req, res, next) => {
         kantah_BPN_sertifikasi,
         kordinat_x,
         kordinat_y,
-        kronologis: files.kronologis
-          ? files.kronologis[0].filename
-          : asset.kronologis,
-        sertipikat: files.sertipikat
-          ? files.sertipikat[0].filename
-          : asset.sertipikat,
+        kronologis: kronologisFileId,
+        sertipikat: sertipikatFileId,
       },
       {
         where: {
@@ -281,6 +340,7 @@ module.exports = {
   findAssetById,
   createAsset,
   downloadFile,
+  findAssetFilesById,
   updateAsset,
   deleteAsset,
 };
