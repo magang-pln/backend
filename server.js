@@ -13,7 +13,12 @@ const app = express();
 
 app.set("trust proxy", true);
 
-app.use(cors());
+const corsOptions = {
+  origin: "https://aset-properti.netlify.app",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+};
+
+app.use(cors(corsOptions));
 
 app.use(morgan("dev"));
 
