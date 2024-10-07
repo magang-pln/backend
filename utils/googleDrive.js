@@ -1,10 +1,16 @@
+require("dotenv").config();
 const { google } = require("googleapis");
 const path = require("path");
 const fs = require("fs");
 
+const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
+
 // Inisialisasi Google Drive API dengan Service Account
 const auth = new google.auth.GoogleAuth({
-  keyFile: path.join(__dirname, "../config/service-account-key.json"),
+  credentials: {
+    client_email: serviceAccount.client_email,
+    private_key: serviceAccount.private_key,
+  },
   scopes: ["https://www.googleapis.com/auth/drive"],
 });
 
