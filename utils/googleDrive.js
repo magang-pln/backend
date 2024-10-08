@@ -3,7 +3,9 @@ const { google } = require("googleapis");
 const path = require("path");
 const fs = require("fs");
 
-const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
+const serviceAccount = JSON.parse(
+  fs.readFileSync(process.env.SERVICE_ACCOUNT_KEY_PATH, "utf8")
+);
 
 // Inisialisasi Google Drive API dengan Service Account
 const auth = new google.auth.GoogleAuth({
