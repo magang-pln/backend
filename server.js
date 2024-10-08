@@ -14,8 +14,9 @@ const app = express();
 app.set("trust proxy", true);
 
 const corsOptions = {
-  origin: "https://aset-properti.netlify.app",
+  origin: "*",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
