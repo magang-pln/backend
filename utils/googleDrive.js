@@ -3,15 +3,13 @@ const { google } = require("googleapis");
 const path = require("path");
 const fs = require("fs");
 
-const serviceAccount = JSON.parse(
-  fs.readFileSync(process.env.SERVICE_ACCOUNT_KEY_PATH, "utf8")
-);
+const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT_KEY_PATH);
 
 // Inisialisasi Google Drive API dengan Service Account
 const auth = new google.auth.GoogleAuth({
   credentials: {
     client_email: serviceAccount.client_email,
-    private_key: serviceAccount.private_key,
+    private_key: serviceAccount.private_key.replace(/\\n/g, "\n"),
   },
   scopes: ["https://www.googleapis.com/auth/drive"],
 });
